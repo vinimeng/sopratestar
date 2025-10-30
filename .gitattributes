@@ -1,0 +1,83 @@
+# Normalização automática de quebras de linha
+* text=auto eol=lf
+
+# Arquivos de texto específicos (seguindo .editorconfig)
+*.txt text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.jsx text eol=lf
+*.tsx text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.py text eol=lf
+*.java text eol=lf
+*.cs text eol=lf
+*.vue text eol=lf
+*.svelte text eol=lf
+
+# Scripts com quebras de linha específicas (compatível com .editorconfig)
+*.sh text eol=lf
+*.bash text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Arquivos de configuração
+*.gitignore text eol=lf
+*.gitattributes text eol=lf
+*.editorconfig text eol=lf
+*.env text eol=lf
+*.env.* text eol=lf
+
+# Makefiles (devem manter tabs como definido no .editorconfig)
+Makefile text eol=lf
+makefile text eol=lf
+*.mk text eol=lf
+
+# Arquivos binários
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.exe binary
+*.dll binary
+*.so binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.rar binary
+
+# Fontes
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+
+# Arquivos que não devem ser incluídos em exports
+.gitignore export-ignore
+.gitattributes export-ignore
+.editorconfig export-ignore
+*.log export-ignore
+*.tmp export-ignore
+node_modules/ export-ignore
+.vscode/ export-ignore
+.idea/ export-ignore
+dist/ export-ignore
+build/ export-ignore
+coverage/ export-ignore
+
+# Configurações de linguagem para GitHub
+*.vue linguist-language=Vue
+*.svelte linguist-language=Svelte
+Dockerfile linguist-language=Docker
+*.dockerfile linguist-language=Docker

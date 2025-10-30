@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+packages/*/dist/
+
+# Environment files
+.env
+.env.local
+.env.production
+apps/backend/.env
+apps/frontend/.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+apps/backend/writable/logs/*
+!apps/backend/writable/logs/.gitkeep
+
+# Cache
+.cache/
+apps/backend/writable/cache/*
+!apps/backend/writable/cache/.gitkeep
+apps/backend/writable/session/*
+!apps/backend/writable/session/.gitkeep
+
+# IDEs
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Uploads
+apps/backend/writable/uploads/*
+!apps/backend/writable/uploads/.gitkeep
+
+# Database
+*.sqlite
+*.db
+
+# Coverage
+coverage/
+*.lcov
+
+# TypeScript
+*.tsbuildinfo
