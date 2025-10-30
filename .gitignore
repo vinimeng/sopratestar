@@ -60,3 +60,6 @@ coverage/
 
 # TypeScript
 *.tsbuildinfo
+
+# models
+src/assets/models/*
