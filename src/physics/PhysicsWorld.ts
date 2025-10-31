@@ -60,6 +60,8 @@ export class PhysicsWorld
     step(deltaTime: number): void
     {
         if (!this.world) return;
+
+        this.world.timestep = deltaTime;
         this.world.step();
     }
 

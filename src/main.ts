@@ -9,5 +9,5 @@ window.addEventListener('DOMContentLoaded', () =>
     document.getElementById('app')?.appendChild(canvas);
 
     const game = new Game(canvas);
-    game.start();
+    game.init();
 });

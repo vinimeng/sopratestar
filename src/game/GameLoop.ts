@@ -1,3 +1,6 @@
+import { FPSCounter } from "../ui/FPSCounter";
+import { Game } from "./Game";
+
 export class GameLoop
 {
     private isRunning = false;
@@ -5,6 +8,7 @@ export class GameLoop
     private animationFrameId: number | null = null;
     private updateCallback: (deltaTime: number) => void;
     private renderCallback: () => void;
+    private FPSCounter: FPSCounter;
 
     constructor(
         updateCallback: (deltaTime: number) => void,
@@ -12,6 +16,12 @@ export class GameLoop
     ) {
         this.updateCallback = updateCallback;
         this.renderCallback = renderCallback;
+        this.FPSCounter = new FPSCounter();
+
+        if (Game.GLOBAL_CONFIGURATION.FPSCounter)
+        {
+            this.FPSCounter.append();
+        }
     }
 
     start(): void
@@ -27,12 +37,26 @@ export class GameLoop
     {
         if (!this.isRunning) return;
 
+        if (Game.GLOBAL_CONFIGURATION.FPSCounter)
+        {
+            this.FPSCounter.begin();
+        }
+
         const currentTime = performance.now();
         const deltaTime = (currentTime - this.lastTime) / 1000; // em segundos
         this.lastTime = currentTime;
 
         this.updateCallback(deltaTime);
         this.renderCallback();
+
+        if (Game.GLOBAL_CONFIGURATION.FPSCounter)
+        {
+            this.FPSCounter.end();
+        }
+        else if (!Game.GLOBAL_CONFIGURATION.FPSCounter && this.FPSCounter.isAppended())
+        {
+            this.FPSCounter.destroy();
+        }
 
         this.animationFrameId = requestAnimationFrame(this.loop);
     };
