@@ -62,4 +62,4 @@ coverage/
 *.tsbuildinfo
 
 # models
-src/assets/models/*
+src/assets/*
