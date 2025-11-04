@@ -2,43 +2,43 @@ import * as THREE from 'three';
 
 export class Renderer
 {
-    private scene: THREE.Scene;
-    private camera: THREE.PerspectiveCamera;
-    private renderer: THREE.WebGLRenderer;
+    static scene: THREE.Scene;
+    static camera: THREE.PerspectiveCamera;
+    static renderer: THREE.WebGLRenderer;
 
-    constructor(canvas: HTMLCanvasElement)
+    static init(canvas: HTMLCanvasElement)
     {
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x87ceeb);
-        this.scene.fog = new THREE.Fog(0x87ceeb, 50, 200);
+        Renderer.scene = new THREE.Scene();
+        Renderer.scene.background = new THREE.Color(0x87ceeb);
+        Renderer.scene.fog = new THREE.Fog(0x87ceeb, 50, 200);
 
-        this.camera = new THREE.PerspectiveCamera(
+        Renderer.camera = new THREE.PerspectiveCamera(
             75,
             window.innerWidth / window.innerHeight,
             0.1,
             1000
         );
-        this.camera.position.set(0, 10, 20);
-        this.camera.lookAt(0, 0, 0);
+        Renderer.camera.position.set(0, 10, 20);
+        Renderer.camera.lookAt(0, 0, 0);
 
-        this.renderer = new THREE.WebGLRenderer({
+        Renderer.renderer = new THREE.WebGLRenderer({
             canvas,
             antialias: true
         });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        Renderer.renderer.setSize(window.innerWidth, window.innerHeight);
+        Renderer.renderer.shadowMap.enabled = true;
+        Renderer.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-        this.setupLights();
-        this.setupEnvironment();
+        Renderer.setupLights();
+        Renderer.setupEnvironment();
 
-        window.addEventListener('resize', this.onResize.bind(this));
+        window.addEventListener('resize', Renderer.onResize);
     }
 
-    private setupLights(): void
+    static setupLights(): void
     {
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        this.scene.add(ambientLight);
+        Renderer.scene.add(ambientLight);
 
         const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
         directionalLight.position.set(50, 100, 50);
@@ -53,14 +53,14 @@ export class Renderer
         directionalLight.shadow.mapSize.width = 2048;
         directionalLight.shadow.mapSize.height = 2048;
 
-        this.scene.add(directionalLight);
+        Renderer.scene.add(directionalLight);
 
         // Luz hemisférica para iluminação ambiente mais natural
         const hemiLight = new THREE.HemisphereLight(0x87ceeb, 0x545454, 0.4);
-        this.scene.add(hemiLight);
+        Renderer.scene.add(hemiLight);
     }
 
-    private setupEnvironment(): void
+    static setupEnvironment(): void
     {
         // Chão grande ao redor da pista
         const groundGeometry = new THREE.PlaneGeometry(500, 500);
@@ -72,33 +72,23 @@ export class Renderer
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         ground.position.y = -0.1;
-        this.scene.add(ground);
+        Renderer.scene.add(ground);
 
         // Grid helper para referência
         const gridHelper = new THREE.GridHelper(500, 50, 0x888888, 0x444444);
         gridHelper.position.y = -0.09;
-        this.scene.add(gridHelper);
+        Renderer.scene.add(gridHelper);
     }
 
-    private onResize(): void
+    static onResize(): void
     {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        Renderer.camera.aspect = window.innerWidth / window.innerHeight;
+        Renderer.camera.updateProjectionMatrix();
+        Renderer.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    render(): void
+    static render(): void
     {
-        this.renderer.render(this.scene, this.camera);
-    }
-
-    getScene(): THREE.Scene
-    {
-        return this.scene;
-    }
-
-    getCamera(): THREE.Camera
-    {
-        return this.camera;
+        Renderer.renderer.render(Renderer.scene, Renderer.camera);
     }
 }

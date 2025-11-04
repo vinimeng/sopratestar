@@ -8,6 +8,5 @@ window.addEventListener('DOMContentLoaded', () =>
     canvas.id = 'game-canvas';
     document.getElementById('app')?.appendChild(canvas);
 
-    const game = new Game(canvas);
-    game.init();
+    Game.init(canvas);
 });

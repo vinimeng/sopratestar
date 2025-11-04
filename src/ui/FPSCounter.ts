@@ -2,45 +2,44 @@ import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 export class FPSCounter
 {
-    private stats: Stats;
-    private appended: boolean = false;
+    private static stats: Stats | null = null;
+    static isAppended: boolean = false;
 
-    constructor(showPanel = 0)
+    static append(showPanel = 0): void
     {
-        this.stats = new Stats();
-        this.stats.showPanel(showPanel); // 0: fps, 1: ms, 2: mb
+        FPSCounter.stats = new Stats();
+        FPSCounter.stats.showPanel(showPanel); // 0: fps, 1: ms, 2: mb
+        document.body.appendChild(FPSCounter.stats.dom);
+        FPSCounter.isAppended = true;
     }
 
-    append(): void
+    static destroy(): void
     {
-        document.body.appendChild(this.stats.dom);
-        this.appended = true;
-    }
+        if (!FPSCounter.stats) return;
 
-    destroy(): void
-    {
-        this.stats.end();
+        FPSCounter.stats.end();
 
-        if (this.stats.dom.parentElement)
+        if (FPSCounter.stats.dom.parentElement)
         {
-            this.stats.dom.parentElement.removeChild(this.stats.dom);
+            FPSCounter.stats.dom.parentElement.removeChild(FPSCounter.stats.dom);
         }
 
-        this.appended = false;
+        FPSCounter.stats = null;
+
+        FPSCounter.isAppended = false;
     }
 
-    begin(): void
+    static begin(): void
     {
-        this.stats.begin();
+        if (!FPSCounter.stats) return;
+
+        FPSCounter.stats.begin();
     }
 
-    end(): void
+    static end(): void
     {
-        this.stats.end();
-    }
+        if (!FPSCounter.stats) return;
 
-    isAppended(): boolean
-    {
-        return this.appended;
+        FPSCounter.stats.end();
     }
 }

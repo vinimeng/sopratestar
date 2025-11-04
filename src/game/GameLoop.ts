@@ -1,30 +1,14 @@
 import { FPSCounter } from "../ui/FPSCounter";
+import { Configuration } from "../utils/Configuration";
 import { Game } from "./Game";
 
 export class GameLoop
 {
-    private isRunning = false;
-    private lastTime = 0;
-    private animationFrameId: number | null = null;
-    private updateCallback: (deltaTime: number) => void;
-    private renderCallback: () => void;
-    private FPSCounter: FPSCounter;
+    static isRunning = false;
+    static lastTime = 0;
+    static animationFrameId: number | null = null;
 
-    constructor(
-        updateCallback: (deltaTime: number) => void,
-        renderCallback: () => void
-    ) {
-        this.updateCallback = updateCallback;
-        this.renderCallback = renderCallback;
-        this.FPSCounter = new FPSCounter();
-
-        if (Game.GLOBAL_CONFIGURATION.FPSCounter)
-        {
-            this.FPSCounter.append();
-        }
-    }
-
-    start(): void
+    static start(): void
     {
         if (this.isRunning) return;
 
@@ -33,35 +17,42 @@ export class GameLoop
         this.loop();
     }
 
-    private loop = (): void =>
+    static loop = (): void =>
     {
         if (!this.isRunning) return;
 
-        if (Game.GLOBAL_CONFIGURATION.FPSCounter)
+        // Gerenciar anexação/remoção do FPS Counter
+        if (Configuration.FPS_COUNTER && !FPSCounter.isAppended)
         {
-            this.FPSCounter.begin();
+            FPSCounter.append();
+        }
+        else if (!Configuration.FPS_COUNTER && FPSCounter.isAppended)
+        {
+            FPSCounter.destroy();
+        }
+
+        // Medir performance se habilitado
+        if (Configuration.FPS_COUNTER)
+        {
+            FPSCounter.begin();
         }
 
         const currentTime = performance.now();
         const deltaTime = (currentTime - this.lastTime) / 1000; // em segundos
         this.lastTime = currentTime;
 
-        this.updateCallback(deltaTime);
-        this.renderCallback();
+        Game.update(deltaTime);
+        Game.render();
 
-        if (Game.GLOBAL_CONFIGURATION.FPSCounter)
+        if (Configuration.FPS_COUNTER)
         {
-            this.FPSCounter.end();
-        }
-        else if (!Game.GLOBAL_CONFIGURATION.FPSCounter && this.FPSCounter.isAppended())
-        {
-            this.FPSCounter.destroy();
+            FPSCounter.end();
         }
 
         this.animationFrameId = requestAnimationFrame(this.loop);
     };
 
-    stop(): void
+    static stop(): void
     {
         this.isRunning = false;
         if (this.animationFrameId !== null)

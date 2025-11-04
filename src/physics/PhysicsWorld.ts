@@ -2,35 +2,35 @@ import RAPIER from '@dimforge/rapier3d-compat';
 
 export class PhysicsWorld
 {
-    private world: RAPIER.World | null = null;
+    static world: RAPIER.World | null = null;
 
-    async initialize(): Promise<void>
+    static async init(): Promise<void>
     {
         await RAPIER.init();
 
         const gravity = { x: 0.0, y: -9.81, z: 0.0 };
-        this.world = new RAPIER.World(gravity);
+        PhysicsWorld.world = new RAPIER.World(gravity);
 
         // Criar chão físico
-        this.createGround();
+        PhysicsWorld.createGround();
 
         console.log('Physics world initialized');
     }
 
-    private createGround(): void
+    static createGround(): void
     {
-        if (!this.world) return;
+        if (!PhysicsWorld.world) return;
 
         const groundColliderDesc = RAPIER.ColliderDesc.cuboid(50.0, 0.1, 50.0);
-        this.world.createCollider(groundColliderDesc);
+        PhysicsWorld.world.createCollider(groundColliderDesc);
     }
 
-    createRigidBody(
+    static createRigidBody(
         position: { x: number; y: number; z: number },
         isDynamic: boolean = true
     ): RAPIER.RigidBody | null
     {
-        if (!this.world) return null;
+        if (!PhysicsWorld.world) return null;
 
         const rigidBodyDesc = isDynamic
             ? RAPIER.RigidBodyDesc.dynamic()
@@ -38,15 +38,15 @@ export class PhysicsWorld
 
         rigidBodyDesc.setTranslation(position.x, position.y, position.z);
 
-        return this.world.createRigidBody(rigidBodyDesc);
+        return PhysicsWorld.world.createRigidBody(rigidBodyDesc);
     }
 
-    createBoxCollider(
+    static createBoxCollider(
         rigidBody: RAPIER.RigidBody,
         halfExtents: { x: number; y: number; z: number }
     ): RAPIER.Collider | null
     {
-        if (!this.world) return null;
+        if (!PhysicsWorld.world) return null;
 
         const colliderDesc = RAPIER.ColliderDesc.cuboid(
             halfExtents.x,
@@ -54,19 +54,14 @@ export class PhysicsWorld
             halfExtents.z
         );
 
-        return this.world.createCollider(colliderDesc, rigidBody);
+        return PhysicsWorld.world.createCollider(colliderDesc, rigidBody);
     }
 
-    step(deltaTime: number): void
+    static step(deltaTime: number): void
     {
-        if (!this.world) return;
+        if (!PhysicsWorld.world) return;
 
-        this.world.timestep = deltaTime;
-        this.world.step();
-    }
-
-    getWorld(): RAPIER.World | null
-    {
-        return this.world;
+        PhysicsWorld.world.timestep = deltaTime;
+        PhysicsWorld.world.step();
     }
 }
