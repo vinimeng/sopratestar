@@ -1,9 +1,9 @@
 import * as THREE from 'three';
+import { Camera } from '../entities/Camera';
 
 export class Renderer
 {
     static scene: THREE.Scene;
-    static camera: THREE.PerspectiveCamera;
     static renderer: THREE.WebGLRenderer;
 
     static init(canvas: HTMLCanvasElement)
@@ -11,15 +11,6 @@ export class Renderer
         Renderer.scene = new THREE.Scene();
         Renderer.scene.background = new THREE.Color(0x87ceeb);
         Renderer.scene.fog = new THREE.Fog(0x87ceeb, 50, 200);
-
-        Renderer.camera = new THREE.PerspectiveCamera(
-            75,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            1000
-        );
-        Renderer.camera.position.set(0, 10, 20);
-        Renderer.camera.lookAt(0, 0, 0);
 
         Renderer.renderer = new THREE.WebGLRenderer({
             canvas,
@@ -82,13 +73,17 @@ export class Renderer
 
     static onResize(): void
     {
-        Renderer.camera.aspect = window.innerWidth / window.innerHeight;
-        Renderer.camera.updateProjectionMatrix();
+        if (Camera.camera)
+        {
+            Camera.onResize();
+        }
+
         Renderer.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
     static render(): void
     {
-        Renderer.renderer.render(Renderer.scene, Renderer.camera);
+        if (!Camera.camera) return;
+        Renderer.renderer.render(Renderer.scene, Camera.camera);
     }
 }

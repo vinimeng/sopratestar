@@ -3,3 +3,16 @@
 body {
     margin: 0;
 }
+
+canvas {
+    cursor: crosshair;
+}
+
+canvas:hover {
+    cursor: pointer;
+}
+
+/* Quando o mouse está capturado, esconder o cursor */
+canvas:focus {
+    outline: none;
+}

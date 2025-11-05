@@ -1,6 +1,7 @@
 import { GameLoop } from './GameLoop';
 import { Renderer } from '../renderer/Renderer';
 import { PhysicsWorld } from '../physics/PhysicsWorld';
+import { Camera } from '../entities/Camera';
 
 export class Game
 {
@@ -14,6 +15,8 @@ export class Game
             // Inicializar renderizador
             Renderer.init(canvas);
 
+            Camera.init();
+
             GameLoop.start();
         }
         catch (error)
@@ -24,6 +27,7 @@ export class Game
 
     static update(deltaTime: number): void
     {
+        Camera.update(deltaTime);
         PhysicsWorld.step(deltaTime);
     }
 
