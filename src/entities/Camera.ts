@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { CONFIG, CONTROLS } from '../utils/Constants';
+import { CONFIG, CONTROLS } from '../utils/Globals';
 import type { CameraType } from '../types';
 
 export class Camera
