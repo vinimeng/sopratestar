@@ -235,7 +235,7 @@ export class Camera
         Camera.camera.position.set(x, y, z);
     }
 
-    setOffset(x: number, y: number, z: number): void
+    static setOffset(x: number, y: number, z: number): void
     {
         if (!Camera.offset) return;
         Camera.offset.set(x, y, z);
