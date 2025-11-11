@@ -35,6 +35,7 @@ export class Camera
         Camera.pitch = 0;
         Camera.velocity = new THREE.Vector3();
         Camera.speed = 10;
+        Camera.camera.position.set(0, 20, 75);
         Input.mouseMovementCallbacks.push(Camera.onMouseMove);
     }
 

@@ -8,6 +8,7 @@ import { Input } from '../controllers/Input';
 export class Game
 {
     static state: 'running' | 'paused' = 'running';
+    static seconds: number = 0;
 
     static async init(canvas: HTMLCanvasElement): Promise<void>
     {
@@ -51,6 +52,11 @@ export class Game
         {
             Camera.update(deltaTime);
             PhysicsWorld.step(deltaTime);
+            Game.seconds += deltaTime;
+            if (Game.seconds >= 3600)
+            {
+                Game.seconds = 0;
+            }
         }
     }
 

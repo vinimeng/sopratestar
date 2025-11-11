@@ -73,6 +73,8 @@ export class Input
 
         window.addEventListener('mousemove', (e) =>
         {
+            if (document.pointerLockElement !== document.body) return;
+
             Input.mouseMovementCallbacks.forEach(callback =>
             {
                 callback(e.movementX, e.movementY);
