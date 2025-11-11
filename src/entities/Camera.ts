@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CONFIG, CONTROLS } from '../utils/Globals';
 import type { CameraType } from '../types';
+import { Input } from '../controllers/Input';
 
 export class Camera
 {
@@ -12,14 +13,6 @@ export class Camera
     static velocity?: THREE.Vector3;
     static pitch?: number;
     static yaw?: number;
-    static keys?: {
-        forward: boolean;
-        backward: boolean;
-        left: boolean;
-        right: boolean;
-        up: boolean;
-        down: boolean;
-    };
     static currentCameraMode: CameraType;
 
     static init(): void
@@ -30,57 +23,9 @@ export class Camera
         {
             Camera.initFreeCamera();
         }
-        else if (CONFIG.CAMERA_TYPE === 'FirstPerson')
-        {
-            Camera.initFirstPersonCamera();
-        }
         else if (CONFIG.CAMERA_TYPE === 'ThirdPerson')
         {
             Camera.initThirdPersonCamera();
-        }
-    }
-
-    private static initControls(): void
-    {
-        document.addEventListener('keydown', (event) => this.onKeyDown(event));
-        document.addEventListener('keyup', (event) => this.onKeyUp(event));
-        document.addEventListener('mousemove', (event) => this.onMouseMove(event));
-    }
-
-    private static removeControls(): void
-    {
-        document.removeEventListener('keydown', (event) => this.onKeyDown(event));
-        document.removeEventListener('keyup', (event) => this.onKeyUp(event));
-        document.removeEventListener('mousemove', (event) => this.onMouseMove(event));
-    }
-
-    private static onKeyDown(event: KeyboardEvent): void
-    {
-        if (!this.keys || CONFIG.CAMERA_TYPE !== 'FreeCamera') return;
-
-        switch (event.code)
-        {
-            case CONTROLS.FORWARD: this.keys.forward = true; break;
-            case CONTROLS.BACKWARD: this.keys.backward = true; break;
-            case CONTROLS.LEFT: this.keys.left = true; break;
-            case CONTROLS.RIGHT: this.keys.right = true; break;
-            case CONTROLS.HANDBRAKE: this.keys.up = true; break;
-            case CONTROLS.BOOST: this.keys.down = true; break;
-        }
-    }
-
-    private static onKeyUp(event: KeyboardEvent): void
-    {
-        if (!this.keys || CONFIG.CAMERA_TYPE !== 'FreeCamera') return;
-
-        switch (event.code)
-        {
-            case CONTROLS.FORWARD: this.keys.forward = false; break;
-            case CONTROLS.BACKWARD: this.keys.backward = false; break;
-            case CONTROLS.LEFT: this.keys.left = false; break;
-            case CONTROLS.RIGHT: this.keys.right = false; break;
-            case CONTROLS.HANDBRAKE: this.keys.up = false; break;
-            case CONTROLS.BOOST: this.keys.down = false; break;
         }
     }
 
@@ -88,39 +33,18 @@ export class Camera
     {
         Camera.yaw = 0;
         Camera.pitch = 0;
-        Camera.keys = {
-            forward: false,
-            backward: false,
-            left: false,
-            right: false,
-            up: false,
-            down: false
-        };
         Camera.velocity = new THREE.Vector3();
         Camera.speed = 10;
-        this.initControls();
+        Input.mouseMovementCallbacks.push(Camera.onMouseMove);
     }
 
     private static destroyFreeCamera(): void
     {
-        this.removeControls();
         Camera.yaw = undefined;
         Camera.pitch = undefined;
-        Camera.keys = undefined;
         Camera.velocity = undefined;
         Camera.speed = undefined;
-    }
-
-    private static initFirstPersonCamera(): void
-    {
-        Camera.offset = new THREE.Vector3(0, 1.8, 0); // Altura dos olhos
-        Camera.smoothness = 5; // Valor de suavidade
-    }
-
-    private static destroyFirstPersonCamera(): void
-    {
-        Camera.offset = undefined;
-        Camera.smoothness = undefined;
+        Input.mouseMovementCallbacks = Input.mouseMovementCallbacks.filter(cb => cb !== Camera.onMouseMove);
     }
 
     private static initThirdPersonCamera(): void
@@ -135,61 +59,56 @@ export class Camera
         Camera.smoothness = undefined;
     }
 
-    static onMouseMove(event: MouseEvent): void
+    static onMouseMove(deltaX: number, deltaY: number): void
     {
         if (CONFIG.CAMERA_TYPE !== 'FreeCamera' || Camera.yaw === undefined || Camera.pitch === undefined) return;
 
-        Camera.yaw -= event.movementX * CONFIG.MOUSE_SENSITIVITY;
-        Camera.pitch -= event.movementY * CONFIG.MOUSE_SENSITIVITY;
+        Camera.yaw -= deltaX * CONFIG.MOUSE_SENSITIVITY;
+        Camera.pitch -= deltaY * CONFIG.MOUSE_SENSITIVITY;
         Camera.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, Camera.pitch));
     }
 
     static update(deltaTime: number): void
     {
-        if (Camera.currentCameraMode !== CONFIG.CAMERA_TYPE)
+        if (Input.isCommandPressed(CONTROLS.CHANGE_CAMERA))
         {
+            Input.unsetCommand(CONTROLS.CHANGE_CAMERA);
+
+            CONFIG.CAMERA_TYPE = CONFIG.CAMERA_TYPE === 'FreeCamera' ? 'ThirdPerson' : 'FreeCamera';
+
             if (Camera.currentCameraMode === 'FreeCamera')
             {
                 Camera.destroyFreeCamera();
-            }
-            else if (Camera.currentCameraMode === 'FirstPerson')
-            {
-                Camera.destroyFirstPersonCamera();
+                Camera.initThirdPersonCamera();
             }
             else if (Camera.currentCameraMode === 'ThirdPerson')
             {
                 Camera.destroyThirdPersonCamera();
-            }
-
-            if (CONFIG.CAMERA_TYPE === 'FreeCamera')
-            {
                 Camera.initFreeCamera();
-            }
-            else if (CONFIG.CAMERA_TYPE === 'FirstPerson')
-            {
-                Camera.initFirstPersonCamera();
-            }
-            else if (CONFIG.CAMERA_TYPE === 'ThirdPerson')
-            {
-                Camera.initThirdPersonCamera();
             }
 
             Camera.currentCameraMode = CONFIG.CAMERA_TYPE;
         }
 
-        if (Camera.currentCameraMode === 'FreeCamera' && Camera.keys !== undefined && Camera.yaw !== undefined && Camera.pitch !== undefined && Camera.velocity !== undefined && Camera.speed !== undefined)
+        if (Camera.camera.fov !== CONFIG.FOV)
+        {
+            Camera.camera.fov = CONFIG.FOV;
+            Camera.camera.updateProjectionMatrix();
+        }
+
+        if (Camera.currentCameraMode === 'FreeCamera' && Camera.yaw !== undefined && Camera.pitch !== undefined && Camera.velocity !== undefined && Camera.speed !== undefined)
         {
             Camera.camera.rotation.set(Camera.pitch, Camera.yaw, 0);
 
             // Calcular movimento
             Camera.velocity.set(0, 0, 0);
 
-            if (Camera.keys.forward) Camera.velocity.z -= 1;
-            if (Camera.keys.backward) Camera.velocity.z += 1;
-            if (Camera.keys.left) Camera.velocity.x -= 1;
-            if (Camera.keys.right) Camera.velocity.x += 1;
-            if (Camera.keys.up) Camera.velocity.y += 1;
-            if (Camera.keys.down) Camera.velocity.y -= 1;
+            if (Input.isCommandPressed(CONTROLS.FORWARD)) Camera.velocity.z -= 1;
+            if (Input.isCommandPressed(CONTROLS.BACKWARD)) Camera.velocity.z += 1;
+            if (Input.isCommandPressed(CONTROLS.LEFT)) Camera.velocity.x -= 1;
+            if (Input.isCommandPressed(CONTROLS.RIGHT)) Camera.velocity.x += 1;
+            if (Input.isCommandPressed(CONTROLS.BOOST)) Camera.velocity.y += 1;
+            if (Input.isCommandPressed(CONTROLS.HANDBRAKE)) Camera.velocity.y -= 1;
 
             // Normalizar e aplicar velocidade
             if (Camera.velocity.length() > 0)
@@ -201,17 +120,6 @@ export class Camera
                 Camera.velocity.applyQuaternion(Camera.camera.quaternion);
                 Camera.camera.position.add(Camera.velocity);
             }
-        }
-        else if (Camera.currentCameraMode === 'FirstPerson' && Camera.target !== undefined && Camera.offset !== undefined)
-        {
-            const cameraPosition = new THREE.Vector3();
-            cameraPosition.copy(Camera.target.position);
-            cameraPosition.add(Camera.offset);
-
-            Camera.camera.position.copy(cameraPosition);
-
-            // Rotação baseada na rotação do target
-            Camera.camera.rotation.copy(Camera.target.rotation);
         }
         else if (Camera.currentCameraMode === 'ThirdPerson' && Camera.target !== undefined && Camera.offset !== undefined && Camera.smoothness !== undefined)
         {

@@ -2,9 +2,13 @@ import { GameLoop } from './GameLoop';
 import { Renderer } from '../renderer/Renderer';
 import { PhysicsWorld } from '../physics/PhysicsWorld';
 import { Camera } from '../entities/Camera';
+import { CONTROLS } from '../utils/Globals';
+import { Input } from '../controllers/Input';
 
 export class Game
 {
+    static state: 'running' | 'paused' = 'running';
+
     static async init(canvas: HTMLCanvasElement): Promise<void>
     {
         try
@@ -18,6 +22,8 @@ export class Game
             Camera.init();
 
             GameLoop.start();
+
+            Input.init();
         }
         catch (error)
         {
@@ -27,8 +33,25 @@ export class Game
 
     static update(deltaTime: number): void
     {
-        Camera.update(deltaTime);
-        PhysicsWorld.step(deltaTime);
+        if (Game.state === 'running' && Input.isCommandPressed(CONTROLS.PAUSE))
+        {
+            Game.state = 'paused';
+            Game.pause();
+            Input.unsetCommand(CONTROLS.PAUSE);
+            Input.unlockPointer();
+        }
+        else if (Game.state === 'paused' && Input.isCommandPressed(CONTROLS.PAUSE))
+        {
+            Game.state = 'running';
+            Game.resume();
+            Input.unsetCommand(CONTROLS.PAUSE);
+            Input.lockPointer();
+        }
+        else if (Game.state === 'running')
+        {
+            Camera.update(deltaTime);
+            PhysicsWorld.step(deltaTime);
+        }
     }
 
     static render(): void
@@ -38,11 +61,11 @@ export class Game
 
     static pause(): void
     {
-        GameLoop.stop();
+        console.log('Game paused');
     }
 
     static resume(): void
     {
-        GameLoop.start();
+        console.log('Game resumed');
     }
 }

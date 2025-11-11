@@ -1,12 +1,15 @@
+import { Game } from '../game/Game';
 import { CONTROLS } from '../utils/Globals';
 
 export class Input
 {
-    private static keys?: { [key: string]: boolean };
+    private static commands?: { [command: string]: boolean };
+    static lastKeyPressed?: string;
+    static mouseMovementCallbacks: Array<(deltaX: number, deltaY: number) => void> = [];
 
     static init()
     {
-        Input.keys = {
+        Input.commands = {
             [CONTROLS.FORWARD]: false,
             [CONTROLS.BACKWARD]: false,
             [CONTROLS.LEFT]: false,
@@ -22,25 +25,91 @@ export class Input
 
     private static setupEventListeners(): void
     {
-        window.addEventListener('keydown', (e) => {
-            Input.keys![e.code] = true;
+        window.addEventListener('keydown', (e) =>
+        {
+            if (Input.commands && e.code in Input.commands)
+            {
+                Input.commands[e.code] = true;
+            }
+
+            Input.lastKeyPressed = e.code;
         });
 
-        window.addEventListener('keyup', (e) => {
-            Input.keys![e.code] = false;
+        window.addEventListener('keyup', (e) =>
+        {
+            if (Input.commands && e.code in Input.commands)
+            {
+                Input.commands[e.code] = false;
+            }
         });
 
-        window.addEventListener('click', () => {
+        window.addEventListener('mousedown', (e) =>
+        {
+            if (Input.commands && `Mouse${e.button}` in Input.commands)
+            {
+                Input.commands[`Mouse${e.button}`] = true;
+            }
 
+            Input.lastKeyPressed = `Mouse${e.button}`;
+
+            if (document.pointerLockElement !== document.body && e.button === 0 && Game.state === 'running')
+            {
+                document.body.requestPointerLock();
+            }
         });
 
-        window.addEventListener('contextmenu', () => {
+        window.addEventListener('mouseup', (e) =>
+        {
+            if (Input.commands && `Mouse${e.button}` in Input.commands)
+            {
+                Input.commands[`Mouse${e.button}`] = false;
+            }
+        });
 
+        window.addEventListener('contextmenu', (e) =>
+        {
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', (e) =>
+        {
+            Input.mouseMovementCallbacks.forEach(callback =>
+            {
+                callback(e.movementX, e.movementY);
+            });
         });
     }
 
-    static isKeyPressed(key: string): boolean
+    static isCommandPressed(command: string): boolean
     {
-        return Input.keys![key] || false;
+        if (Input.commands && command in Input.commands)
+        {
+            return Input.commands[command];
+        }
+        return false;
+    }
+
+    static unsetCommand(command: string): void
+    {
+        if (Input.commands && command in Input.commands)
+        {
+            Input.commands[command] = false;
+        }
+    }
+
+    static lockPointer(): void
+    {
+        if (document.pointerLockElement !== document.body)
+        {
+            document.body.requestPointerLock();
+        }
+    }
+
+    static unlockPointer(): void
+    {
+        if (document.pointerLockElement === document.body)
+        {
+            document.exitPointerLock();
+        }
     }
 }

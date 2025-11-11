@@ -11,7 +11,7 @@ export const CONTROLS = {
     BOOST: 'ShiftLeft',
     CHANGE_CAMERA: 'KeyC',
     EXIT: 'Escape',
-    PAUSE: 'Tab'
+    PAUSE: 'KeyP'
 }
 
 export const CONFIG = {
