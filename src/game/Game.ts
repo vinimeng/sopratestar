@@ -2,13 +2,11 @@ import { GameLoop } from './GameLoop';
 import { Renderer } from '../renderer/Renderer';
 import { PhysicsWorld } from '../physics/PhysicsWorld';
 import { Camera } from '../entities/Camera';
-import { CONTROLS } from '../utils/Globals';
 import { Input } from '../controllers/Input';
 
 export class Game
 {
     static state: 'running' | 'paused' = 'running';
-    static seconds: number = 0;
 
     static async init(canvas: HTMLCanvasElement): Promise<void>
     {
@@ -34,29 +32,24 @@ export class Game
 
     static update(deltaTime: number): void
     {
-        if (Game.state === 'running' && Input.isCommandPressed(CONTROLS.PAUSE))
+        if (Game.state === 'running' && Input.isCommandPressed(window.GLOBALS.CONTROLS.PAUSE))
         {
             Game.state = 'paused';
             Game.pause();
-            Input.unsetCommand(CONTROLS.PAUSE);
+            Input.unsetCommand(window.GLOBALS.CONTROLS.PAUSE);
             Input.unlockPointer();
         }
-        else if (Game.state === 'paused' && Input.isCommandPressed(CONTROLS.PAUSE))
+        else if (Game.state === 'paused' && Input.isCommandPressed(window.GLOBALS.CONTROLS.PAUSE))
         {
             Game.state = 'running';
             Game.resume();
-            Input.unsetCommand(CONTROLS.PAUSE);
+            Input.unsetCommand(window.GLOBALS.CONTROLS.PAUSE);
             Input.lockPointer();
         }
         else if (Game.state === 'running')
         {
             Camera.update(deltaTime);
             PhysicsWorld.step(deltaTime);
-            Game.seconds += deltaTime;
-            if (Game.seconds >= 3600)
-            {
-                Game.seconds = 0;
-            }
         }
     }
 

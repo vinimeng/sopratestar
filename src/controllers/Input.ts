@@ -1,5 +1,4 @@
 import { Game } from '../game/Game';
-import { CONTROLS } from '../utils/Globals';
 
 export class Input
 {
@@ -10,15 +9,15 @@ export class Input
     static init()
     {
         Input.commands = {
-            [CONTROLS.FORWARD]: false,
-            [CONTROLS.BACKWARD]: false,
-            [CONTROLS.LEFT]: false,
-            [CONTROLS.RIGHT]: false,
-            [CONTROLS.HANDBRAKE]: false,
-            [CONTROLS.BOOST]: false,
-            [CONTROLS.CHANGE_CAMERA]: false,
-            [CONTROLS.EXIT]: false,
-            [CONTROLS.PAUSE]: false
+            [window.GLOBALS.CONTROLS.FORWARD]: false,
+            [window.GLOBALS.CONTROLS.BACKWARD]: false,
+            [window.GLOBALS.CONTROLS.LEFT]: false,
+            [window.GLOBALS.CONTROLS.RIGHT]: false,
+            [window.GLOBALS.CONTROLS.HANDBRAKE]: false,
+            [window.GLOBALS.CONTROLS.BOOST]: false,
+            [window.GLOBALS.CONTROLS.CHANGE_CAMERA]: false,
+            [window.GLOBALS.CONTROLS.EXIT]: false,
+            [window.GLOBALS.CONTROLS.PAUSE]: false
         }
         Input.setupEventListeners();
     }

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Camera } from '../entities/Camera';
+import { SkyBox } from './SkyBox';
 
 export class Renderer
 {
@@ -9,16 +10,15 @@ export class Renderer
     static init(canvas: HTMLCanvasElement)
     {
         Renderer.scene = new THREE.Scene();
-        // Renderer.scene.background = new THREE.Color(0x87ceeb);
-        // Renderer.scene.fog = new THREE.Fog(0x87ceeb, 50, 200);
+        SkyBox.init();
 
         Renderer.renderer = new THREE.WebGLRenderer({
             canvas,
             antialias: true
         });
         Renderer.renderer.setSize(window.innerWidth, window.innerHeight);
-        // Renderer.renderer.shadowMap.enabled = true;
-        // Renderer.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        Renderer.renderer.shadowMap.enabled = true;
+        Renderer.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
         Renderer.setupLights();
         Renderer.setupEnvironment();
@@ -84,6 +84,7 @@ export class Renderer
     static render(): void
     {
         if (!Camera.camera) return;
+        SkyBox.render();
         Renderer.renderer.render(Renderer.scene, Camera.camera);
     }
 }

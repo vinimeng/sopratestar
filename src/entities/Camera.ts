@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { CONFIG, CONTROLS } from '../utils/Globals';
 import type { CameraType } from '../types';
 import { Input } from '../controllers/Input';
 
@@ -17,13 +16,13 @@ export class Camera
 
     static init(): void
     {
-        Camera.currentCameraMode = CONFIG.CAMERA_TYPE;
-        Camera.camera = new THREE.PerspectiveCamera(CONFIG.FOV, window.innerWidth / window.innerHeight);
-        if (CONFIG.CAMERA_TYPE === 'FreeCamera')
+        Camera.currentCameraMode = window.GLOBALS.CONFIG.CAMERA_TYPE;
+        Camera.camera = new THREE.PerspectiveCamera(window.GLOBALS.CONFIG.FOV, window.innerWidth / window.innerHeight);
+        if (window.GLOBALS.CONFIG.CAMERA_TYPE === 'FreeCamera')
         {
             Camera.initFreeCamera();
         }
-        else if (CONFIG.CAMERA_TYPE === 'ThirdPerson')
+        else if (window.GLOBALS.CONFIG.CAMERA_TYPE === 'ThirdPerson')
         {
             Camera.initThirdPersonCamera();
         }
@@ -62,20 +61,20 @@ export class Camera
 
     static onMouseMove(deltaX: number, deltaY: number): void
     {
-        if (CONFIG.CAMERA_TYPE !== 'FreeCamera' || Camera.yaw === undefined || Camera.pitch === undefined) return;
+        if (window.GLOBALS.CONFIG.CAMERA_TYPE !== 'FreeCamera' || Camera.yaw === undefined || Camera.pitch === undefined) return;
 
-        Camera.yaw -= deltaX * CONFIG.MOUSE_SENSITIVITY;
-        Camera.pitch -= deltaY * CONFIG.MOUSE_SENSITIVITY;
+        Camera.yaw -= deltaX * window.GLOBALS.CONFIG.MOUSE_SENSITIVITY;
+        Camera.pitch -= deltaY * window.GLOBALS.CONFIG.MOUSE_SENSITIVITY;
         Camera.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, Camera.pitch));
     }
 
     static update(deltaTime: number): void
     {
-        if (Input.isCommandPressed(CONTROLS.CHANGE_CAMERA))
+        if (Input.isCommandPressed(window.GLOBALS.CONTROLS.CHANGE_CAMERA))
         {
-            Input.unsetCommand(CONTROLS.CHANGE_CAMERA);
+            Input.unsetCommand(window.GLOBALS.CONTROLS.CHANGE_CAMERA);
 
-            CONFIG.CAMERA_TYPE = CONFIG.CAMERA_TYPE === 'FreeCamera' ? 'ThirdPerson' : 'FreeCamera';
+            window.GLOBALS.CONFIG.CAMERA_TYPE = window.GLOBALS.CONFIG.CAMERA_TYPE === 'FreeCamera' ? 'ThirdPerson' : 'FreeCamera';
 
             if (Camera.currentCameraMode === 'FreeCamera')
             {
@@ -88,12 +87,12 @@ export class Camera
                 Camera.initFreeCamera();
             }
 
-            Camera.currentCameraMode = CONFIG.CAMERA_TYPE;
+            Camera.currentCameraMode = window.GLOBALS.CONFIG.CAMERA_TYPE;
         }
 
-        if (Camera.camera.fov !== CONFIG.FOV)
+        if (Camera.camera.fov !== window.GLOBALS.CONFIG.FOV)
         {
-            Camera.camera.fov = CONFIG.FOV;
+            Camera.camera.fov = window.GLOBALS.CONFIG.FOV;
             Camera.camera.updateProjectionMatrix();
         }
 
@@ -104,12 +103,12 @@ export class Camera
             // Calcular movimento
             Camera.velocity.set(0, 0, 0);
 
-            if (Input.isCommandPressed(CONTROLS.FORWARD)) Camera.velocity.z -= 1;
-            if (Input.isCommandPressed(CONTROLS.BACKWARD)) Camera.velocity.z += 1;
-            if (Input.isCommandPressed(CONTROLS.LEFT)) Camera.velocity.x -= 1;
-            if (Input.isCommandPressed(CONTROLS.RIGHT)) Camera.velocity.x += 1;
-            if (Input.isCommandPressed(CONTROLS.BOOST)) Camera.velocity.y += 1;
-            if (Input.isCommandPressed(CONTROLS.HANDBRAKE)) Camera.velocity.y -= 1;
+            if (Input.isCommandPressed(window.GLOBALS.CONTROLS.FORWARD)) Camera.velocity.z -= 1;
+            if (Input.isCommandPressed(window.GLOBALS.CONTROLS.BACKWARD)) Camera.velocity.z += 1;
+            if (Input.isCommandPressed(window.GLOBALS.CONTROLS.LEFT)) Camera.velocity.x -= 1;
+            if (Input.isCommandPressed(window.GLOBALS.CONTROLS.RIGHT)) Camera.velocity.x += 1;
+            if (Input.isCommandPressed(window.GLOBALS.CONTROLS.BOOST)) Camera.velocity.y += 1;
+            if (Input.isCommandPressed(window.GLOBALS.CONTROLS.HANDBRAKE)) Camera.velocity.y -= 1;
 
             // Normalizar e aplicar velocidade
             if (Camera.velocity.length() > 0)
