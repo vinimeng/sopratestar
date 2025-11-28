@@ -21,10 +21,8 @@ declare global
                 FOV: number;
                 MOUSE_SENSITIVITY: number;
             };
-            TIME: {
-                HOURS: number;
-                MINUTES: number;
-            }
+            DATETIME: Date;
+            TIMESCALE: number;
         }
     }
 }

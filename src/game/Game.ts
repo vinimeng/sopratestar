@@ -50,6 +50,9 @@ export class Game
         {
             Camera.update(deltaTime);
             PhysicsWorld.step(deltaTime);
+            window.GLOBALS.DATETIME = new Date(window.GLOBALS.DATETIME.getTime() + (window.GLOBALS.TIMESCALE * 60) / 60 * deltaTime * 60 * 1000);
+            Renderer.skybox.update(window.GLOBALS.DATETIME, deltaTime, Camera.camera.position, Camera.camera);
+            Renderer.clouds.update(deltaTime, Camera.camera.position);
         }
     }
 

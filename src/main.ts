@@ -28,10 +28,8 @@ window.addEventListener('DOMContentLoaded', () =>
             FOV: 90,
             MOUSE_SENSITIVITY: 0.002,
         },
-        TIME: {
-            HOURS: 9,
-            MINUTES: 30,
-        }
+        DATETIME: new Date(),
+        TIMESCALE: 1,
     }
 
     Game.init(canvas);
