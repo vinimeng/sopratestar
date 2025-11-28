@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import StarsShader from "./Shaders/StarsShader";
+import { StarsShader } from "./Shaders/StarsShader";
 
-class Stars extends THREE.Points
+export class Stars extends THREE.Points
 {
     material: THREE.ShaderMaterial;
 
@@ -29,7 +29,10 @@ class Stars extends THREE.Points
         geometry.setAttribute('freq', new THREE.BufferAttribute(mirroredFreqs, 1));
 
         const material = new THREE.ShaderMaterial({
-            uniforms: { time: { value: 0 } },
+            uniforms: {
+                time: { value: 0 },
+                intensity: { value: 0 } // novo
+            },
             vertexShader: StarsShader.vertexShader,
             fragmentShader: StarsShader.fragmentShader,
             transparent: true,
@@ -145,10 +148,9 @@ class Stars extends THREE.Points
         this.material.uniforms.time.value = elapsedTime;
     }
 
-    setVisible(visible: boolean)
+    setIntensity(value: number)
     {
-        this.visible = visible;
+        this.material.uniforms.intensity.value = THREE.MathUtils.clamp(value, 0, 1);
+        this.visible = value > 0.001;
     }
 }
-
-export default Stars;

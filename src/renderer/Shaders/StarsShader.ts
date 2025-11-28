@@ -1,4 +1,4 @@
-const StarsShader = {
+export const StarsShader = {
     vertexShader: `
         attribute float size;
         attribute vec3 color;
@@ -24,6 +24,7 @@ const StarsShader = {
     fragmentShader: `
         varying vec3 vColor;
         varying float vDepth;
+        uniform float intensity;
 
         void main() {
             vec2 center = gl_PointCoord - vec2(0.5);
@@ -38,9 +39,7 @@ const StarsShader = {
 
             float reflectionFactor = smoothstep(0.0, -1000.0, vDepth) * 0.5;
 
-            gl_FragColor = vec4(finalColor, brightness * reflectionFactor);
+            gl_FragColor = vec4(finalColor * intensity, (brightness * reflectionFactor) * intensity);
         }
     `
 };
-
-export default StarsShader;

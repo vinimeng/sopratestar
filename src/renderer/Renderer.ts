@@ -1,17 +1,11 @@
 import * as THREE from 'three';
 import { Camera } from '../entities/Camera';
-import Skybox from './SkyBox';
-import Clouds from './Clouds';
-import Stars from './Stars';
+import { SkyBox } from './SkyBox';
 
 export class Renderer
 {
     static scene: THREE.Scene;
     static renderer: THREE.WebGLRenderer;
-    static skybox: Skybox;
-    static shadowCameraHelper: THREE.CameraHelper;
-    static clouds: Clouds;
-    static stars: Stars;
 
     static init(canvas: HTMLCanvasElement)
     {
@@ -24,10 +18,12 @@ export class Renderer
             precision: "highp",
             powerPreference: 'high-performance'
         });
+		Renderer.renderer.setPixelRatio(window.devicePixelRatio);
         Renderer.renderer.setSize(window.innerWidth, window.innerHeight);
         Renderer.renderer.sortObjects = true;
         Renderer.renderer.debug.checkShaderErrors = true;
         Renderer.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        Renderer.renderer.toneMappingExposure = 0.5;
         Renderer.renderer.outputColorSpace = THREE.SRGBColorSpace;
         Renderer.renderer.shadowMap.enabled = true;
         Renderer.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -35,36 +31,11 @@ export class Renderer
 
         Renderer.setupLights();
         Renderer.setupEnvironment();
-        Renderer.skybox = new Skybox(Skybox.createLensflareTextures());
-        Renderer.clouds = new Clouds();
-        Renderer.stars = new Stars();
-        Renderer.shadowCameraHelper = new THREE.CameraHelper(Renderer.skybox.sun.shadow.camera);
-        Renderer.scene.add(Renderer.skybox);
-        Renderer.scene.add(Renderer.skybox.sun);
-        Renderer.scene.add(Renderer.skybox.sun.target);
-        Renderer.scene.add(Renderer.clouds);
-        Renderer.scene.add(Renderer.stars);
 
-        Renderer.skybox.onTimeOfDayChanged = (newTimeOfDay, _elapsedTime) =>
-        {
-            if (newTimeOfDay === "Nighttime")
-            {
-                Renderer.clouds.setCloudColor(new THREE.Color(0.1, 0.1, 0.2));
-                Renderer.stars.setVisible(true);
-            } else if (newTimeOfDay === "Sunrise")
-            {
-                Renderer.clouds.setCloudColor(new THREE.Color(0.8, 0.4, 0.4));
-                Renderer.stars.setVisible(false);
-            } else if (newTimeOfDay === "Sunset")
-            {
-                Renderer.clouds.setCloudColor(new THREE.Color(0.8, 0.3, 0.3));
-                Renderer.stars.setVisible(false);
-            } else
-            {
-                Renderer.clouds.setCloudColor(new THREE.Color(1.0, 1.0, 1.0));
-                Renderer.stars.setVisible(false);
-            }
-        }
+        SkyBox.init();
+        SkyBox.update(window.GLOBALS.DATETIME, Renderer.renderer, 0);
+        Renderer.scene.add(SkyBox.Sky);
+        Renderer.scene.add(SkyBox.Stars);
 
         window.addEventListener('resize', Renderer.onResize);
     }

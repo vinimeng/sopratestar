@@ -3,6 +3,7 @@ import { Renderer } from '../renderer/Renderer';
 import { PhysicsWorld } from '../physics/PhysicsWorld';
 import { Camera } from '../entities/Camera';
 import { Input } from '../controllers/Input';
+import { SkyBox } from '../renderer/SkyBox';
 
 export class Game
 {
@@ -51,8 +52,7 @@ export class Game
             Camera.update(deltaTime);
             PhysicsWorld.step(deltaTime);
             window.GLOBALS.DATETIME = new Date(window.GLOBALS.DATETIME.getTime() + (window.GLOBALS.TIMESCALE * 60) / 60 * deltaTime * 60 * 1000);
-            Renderer.skybox.update(window.GLOBALS.DATETIME, deltaTime, Camera.camera.position, Camera.camera);
-            Renderer.clouds.update(deltaTime, Camera.camera.position);
+            SkyBox.update(window.GLOBALS.DATETIME, Renderer.renderer, deltaTime);
         }
     }
 
