@@ -29,7 +29,7 @@ window.addEventListener('DOMContentLoaded', () =>
             MOUSE_SENSITIVITY: 0.002,
         },
         DATETIME: new Date(),
-        TIMESCALE: 1,
+        TIMESCALE: 0.5,
     }
 
     Game.init(canvas);
